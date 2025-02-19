@@ -1,3 +1,5 @@
+let eventBus = new Vue ()
+
 Vue.component ('product-tabs', {
     props: {
         reviews: {
@@ -9,9 +11,9 @@ Vue.component ('product-tabs', {
             <div>
                 <ul>
                     <span class="tab" 
-                        :class"{activeTab: selectedTab === tab}"
+                        :class="{activeTab: selectedTab === tab}"
                         v-for="(tab, index) in tabs"
-                        @click="selectedTab" = tab"
+                        @click="selectedTab = tab"
                     >{{ tab }}</span>
                 </ul>
                 <div v-show="selectedTab === 'Reviews'">
@@ -92,7 +94,9 @@ Vue.component('product-review', {
                     review: this.review,
                     rating: this.rating
                 }
-                this.$emit('review-submitted', productReview)
+                
+                eventBus.$emit('review-submitted', productReview => {this.reviews.push(productReview)
+                })
                 this.name = null
                 this.review = null
                 this.rating = null
@@ -158,7 +162,10 @@ Vue.component ('product', {
                     <p>{{ review.review }}</p>
                 </li>
             </ul>
-        </div> <product-review @review-submitted="addReview"></product-review>
+            </div>
+
+        <product-tabs :reviews="reviews" :shipping="shipping" :details="details"></product-tabs>            
+        <product-review @review-submitted="addReview"></product-review>
 
         </div>
             `,
