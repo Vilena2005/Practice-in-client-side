@@ -184,8 +184,12 @@ Vue.component ('product', {
             
             <div class="product-info">
                 <h1>{{ title }}</h1>
-                <p v-if="inStock">In stock</p>
-                <p v-else>Out of Stock</p>
+                <p v-if="inStock">In stock
+                <br>
+                {{variants[selectedVariant].variantQuantity}}</p>
+                <p v-else>Out of Stock
+                <br>
+                {{variants[selectedVariant].variantQuantity}}</p>
 
                 <ul>
                     <li v-for="detail in details">{{ detail }}</li>
@@ -246,11 +250,24 @@ Vue.component ('product', {
     }
 },
 
+
     mounted() {
         eventBus.$on('review-submitted', productReview => {
             this.reviews.push(productReview)
         })
+        if (localStorage.getItem('variants')) {
+            this.variants = JSON.parse(localStorage.getItem('variants'));
+        }
     },
+    watch: {
+        variants: {
+            handler(newVariants) {
+                localStorage.setItem('variants', JSON.stringify(newVariants));
+            },
+            deep: true
+        }
+    },
+
 
     methods: {
         addToCart() {
@@ -294,6 +311,23 @@ let app = new Vue ({
         premium: true,
         cart: []
     },
+
+
+    mounted () {
+        if (localStorage.getItem('cart')) {
+            this.cart = JSON.parse(localStorage.getItem('cart'));
+        }
+    },
+    watch: {
+        cart: {
+            handler(newCart) {
+                localStorage.setItem('cart', JSON.stringify(newCart));
+            },
+            deep: true
+        }
+    },
+
+
     methods: {
         updateCart (id) {
             this.cart.push(id);
