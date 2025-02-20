@@ -33,6 +33,18 @@ Vue.component('product-review', {
         </select>
     </p>
 
+    <div>
+        <p>Would you recommend this product?</p>
+        
+        <div class="recommend-area">
+            <input type="radio" value="Yes" v-model="recommend">
+            <label>Yes</label>
+            <br>
+            <input type="radio" value="No" v-model="recommend">
+            <label>No</label>
+        </div>
+    </div>
+
     <p>
         <input type="submit" value="Submit">
     </p>
@@ -44,16 +56,18 @@ Vue.component('product-review', {
             name: null,
             review: null,
             rating: null,
+            recommend: null,
             errors: []
         }
     },
     methods:{
         onSubmit() {
-            if(this.name && this.review && this.rating) {
+            if(this.name && this.review && this.rating && this.recommend) {
                 let productReview = {
                     name: this.name,
                     review: this.review,
-                    rating: this.rating
+                    rating: this.rating,
+                    recommend: this.recommend
                 }
                 
                 eventBus.$emit('review-submitted', productReview)
@@ -67,6 +81,7 @@ Vue.component('product-review', {
                 if(!this.name) this.errors.push("Name required.")
                 if(!this.review) this.errors.push("Review required.")
                 if(!this.rating) this.errors.push("Rating required.")
+                if(!this.recommend) this.errors.push("Recommend required")
             }
         }
     }
@@ -100,18 +115,60 @@ Vue.component ('product-tabs', {
                     </li>
                 </ul>
             </div>
+
             <div v-show="selectedTab === 'Make a Review'">
                 <product-review></product-review>
+            </div>
+
+            <div v-show="selectedTab === 'Shipping'">
+                <product-shipping></product-shipping>
+            </div>
+
+            <div v-show="selectedTab === 'Details'">
+                <product-detail></product-detail>
             </div>
         </div>
     `,
     data() {
         return {
-            tabs: ['Reviews', 'Make a Review'],
+            tabs: ['Reviews', 'Make a Review', 'Shipping', 'Details'],
             selectedTab: 'Reviews'
         }
     },
 })    
+
+Vue.component('product-shipping', {
+    props: {
+        type: Boolean,
+        required: true
+    },
+    template: `
+    <p>Shipping: {{ shipping }}</p>
+    `,
+    computed: {
+        shipping() {
+            return this.premium ? "Free" : 2.99;
+        }
+    }
+})
+
+Vue.component('product-detail', {
+    props: {
+        type: Array,
+        required: true
+    },
+    template: `
+        <div>
+            <p>Details:</p>
+            <ul>
+                <li>80% cotton</li>
+                <li>20% polyester</li>
+                <li>Gender-neutral</li>
+            </ul>
+        </div>
+    `
+})
+
 Vue.component ('product', {
     props: {
         premium: {
@@ -150,11 +207,19 @@ Vue.component ('product', {
                 >
                     Add to cart
                 </button>
+
+                <button 
+                    v-on:click="delFromCart"
+                    :disabled="!inStock"
+                    :class="{ disabledButton: !inStock }"
+                >
+                    Delete from Cart
+                </button>
             </div>
 
         <product-tabs :reviews="reviews" :shipping="shipping" :details="details"></product-tabs>            
         
-        </div>
+    </div>
             `,
     data () {
         return {
@@ -190,6 +255,9 @@ Vue.component ('product', {
     methods: {
         addToCart() {
             this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
+        },
+        delFromCart() {
+            this.$emit('del-from-cart',this.variants[this.selectedVariant].variantId);
         },
         updateProduct (index) {
             this.selectedVariant = index;
@@ -229,6 +297,9 @@ let app = new Vue ({
     methods: {
         updateCart (id) {
             this.cart.push(id);
+        },
+        deleteFromCart(id) {
+            this.cart.pop(id);
         }
     }
 })
