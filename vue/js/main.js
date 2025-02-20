@@ -112,9 +112,6 @@ Vue.component ('product-tabs', {
         }
     },
 })    
-
-
-
 Vue.component ('product', {
     props: {
         premium: {
@@ -144,9 +141,8 @@ Vue.component ('product', {
                     :key="variant.variantId"
                     :style="{ backgroundColor:variant.variantColor
                     }"
-                    @mouseover="updateProduct(index)"
-                ></div>
-
+                    @mouseover="updateProduct(index)"></div>
+               
                 <button
                     v-on:click="addToCart"
                     :disabled="!inStock"
@@ -156,11 +152,8 @@ Vue.component ('product', {
                 </button>
             </div>
 
-            
-
         <product-tabs :reviews="reviews" :shipping="shipping" :details="details"></product-tabs>            
         
-
         </div>
             `,
     data () {
@@ -188,11 +181,11 @@ Vue.component ('product', {
     }
 },
 
-mounted() {
-    eventBus.$on('review-submitted', productReview => {
-        this.reviews.push(productReview)
-    })
-},
+    mounted() {
+        eventBus.$on('review-submitted', productReview => {
+            this.reviews.push(productReview)
+        })
+    },
 
     methods: {
         addToCart() {
