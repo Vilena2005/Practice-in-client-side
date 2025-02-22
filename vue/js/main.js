@@ -271,10 +271,15 @@ Vue.component ('product', {
 
     methods: {
         addToCart() {
-            this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
+            if (this.variants[this.selectedVariant].variantQuantity > 0) {
+                this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
+                this.variants[this.selectedVariant].variantQuantity--;
+            }
         },
         delFromCart() {
-            this.$emit('del-from-cart',this.variants[this.selectedVariant].variantId);
+            const variantId = this.variants[this.selectedVariant].variantId;
+            this.$emit('del-from-cart', variantId);
+            this.variants[this.selectedVariant].variantQuantity++;
         },
         updateProduct (index) {
             this.selectedVariant = index;
